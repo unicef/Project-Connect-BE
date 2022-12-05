@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- unicef/dev-master-api
+
+pool:
+  vmImage: 'ubuntu-18.04'
+variables: 
+  dockerRegistryServiceConnection: 'UNICEF_DATA_CONNECT_WEB_ACR'
+  dockerfilePath: './Dockerfile'
+  app: 'project-connect-api'
+  imageRepository: 'dev/$(app)'
+  tag: '$(Build.BuildId)'
+  pythonVersion: '3.8'
+
+steps:
+# Use a specific Python version
+- task: UsePythonVersion@0
+  displayName: Building Razor with $(pythonVersion) 
+  inputs:
+     versionSpec: $(pythonVersion)
+     addToPath: true
+# - bash: pip install -r requirements.txt -U --upgrade-strategy eager
+#   displayName: Install packages for build
+
+# Docker build and push    
+- task: Docker@2
+  displayName: Build and push image to container registry
+  inputs:
+    command: buildAndPush
+    repository: $(imageRepository)
+    dockerfile: $(dockerfilePath)
+    containerRegistry: $(dockerRegistryServiceConnection)
+    tags: |
+      $(tag)

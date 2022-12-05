@@ -1,0 +1,12 @@
+{% block subject %}{{dailycheckapp_contact_message.full_name}}: {{dailycheckapp_contact_message.purpose}}{% endblock %}
+
+{% block html %}
+<p>
+    Message from: {{contact_message.full_name}}.<br />
+    School ID: {{contact_message.school_id}}.<br />
+    Email: {{contact_message.email}}.<br />
+</p>
+<p>
+    Message text: {{contact_message.message}}
+</p>
+{% endblock %}

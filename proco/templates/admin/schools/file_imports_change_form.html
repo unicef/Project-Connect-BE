@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .field-errors div.readonly {
+      max-height: 30em;
+      overflow-y: scroll;
+    }
+  </style>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    {% if original.status in original.PROCESS_STATUSES %}
+        <script type="text/javascript">
+            setTimeout(function() {window.location.reload()}, 10 * 1000); // Refresh every 10 minutes
+        </script>
+    {% endif %}
+{% endblock %}

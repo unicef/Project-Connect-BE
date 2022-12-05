@@ -1,0 +1,11 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+
+    {% if original.status in original.PROCESS_STATUSES %}
+        <script type="text/javascript">
+            setTimeout(function() {window.location.reload()}, 5 * 1000); // Refresh every 10 minutes
+        </script>
+    {% endif %}
+{% endblock %}

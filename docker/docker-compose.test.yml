@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  db:
+    container_name: proco_test_db
+    image: mdillon/postgis
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+
+  backend:
+    container_name: proco_test_backend
+    image: proco_backend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: bash -c "sleep 10 && /code/scripts/wait-for-it.sh db:5432 && pipenv run /code/scripts/runtests.sh"
+    environment:
+      DATABASE_URL: postgis://test:test@db/test
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      REDIS_URL: "redis://redis:6379/0"
+    depends_on:
+      - db
+
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"

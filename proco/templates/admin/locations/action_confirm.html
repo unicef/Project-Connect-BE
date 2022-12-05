@@ -1,0 +1,59 @@
+{% extends 'admin/delete_confirmation.html' %}
+{% load i18n admin_urls static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Delete
+</div>
+{% endblock %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>
+      Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects,
+      but your account doesn't have permission to delete the following types of objects:
+    </p>
+    <ul>
+    {% for obj in perms_lacking %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% elif protected %}
+    <p>
+      Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting
+      the following protected related objects:
+    </p>
+    <ul>
+    {% for obj in protected %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <h1>Are you sure?</h1>
+    {% if action == 'mark_as_joined' %}
+    <p>
+      Are you sure you want to mark countries data source as verified? <br>
+      At the next upload of the csv file with the list of schools, all existing schools will be deleted.
+    </p>
+    {% else %}
+    <p>
+      Are you sure you want to delete all school points and saved statistics? <br>
+      The status of the country will return to its original position and it will be necessary to re-mark as joined.
+    </p>
+    {% endif %}
+    {% if action == 'mark_as_joined' %}
+    <form method="post" action="{% url 'admin:update_country_status_to_joined' %}">{% csrf_token %}
+    {% else %}
+    <form method="post" action="{% url 'admin:delete-schools-and-statistics' %}">{% csrf_token %}
+    {% endif %}
+    <div>
+    <input type="hidden" name="post" value="{{ objects }}">
+    <input type="submit" value="Yes, I’m sure">
+    <a href="{% url 'admin:locations_country_changelist' %}" class="button cancel-link">No, take me back</a>
+    </div>
+    </form>
+{% endif %}
+{% endblock %}

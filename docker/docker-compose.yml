@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    volumes:
+      - "./rabbitmq:/var/lib/rabbitmq"
+
+  backend:
+    container_name: proco_prod_backend
+    image: rttest/project-connect-api:prod
+    command: bash -c "sleep 10 && /code/scripts/wait-for-it.sh db:5432 && pipenv run python manage.py migrate && pipenv run gunicorn config.wsgi:application -b 0.0.0.0:8000 -w 4 --timeout=3200"
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.prod"
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+
+  celery_beat:
+    container_name: proco_prod_beat
+    image: rttest/project-connect-api:prod
+    command: pipenv run celery --app=proco.taskapp beat --logfile=/logs/celerybeat.log --loglevel=INFO
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.prod"
+    env_file:
+      - .env
+    volumes:
+      # todo: figure out how to save celerybeat-schedule.db to the disk
+      - './logs:/logs'
+    depends_on:
+      - rabbitmq
+
+  celery_worker:
+    container_name: proco_prod_celeryd
+    image: rttest/project-connect-api:prod
+    command: bash -c "pipenv run celery --app=proco.taskapp multi start 3 --concurrency=3 --loglevel=INFO --time-limit=300 --soft-time-limit=60 --logfile=/logs/celeryd-%n.log && while true; do sleep 2; done"
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.prod"
+    env_file:
+      - .env
+    volumes:
+      - './logs:/logs'
+    depends_on:
+      - rabbitmq

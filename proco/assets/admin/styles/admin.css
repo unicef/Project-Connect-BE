@@ -1,0 +1,55 @@
+ul.action-list {
+  padding-left: 20px;
+}
+ul.action-list li {
+  list-style-type: none;
+}
+ul.action-list li a {
+  font-weight: 600;
+}
+ul.action-list li a i {
+  padding-right: 5px;
+}
+
+.admin-actions {
+  background: #f8f8f8;
+  display: block;
+  float: left;
+  position: relative;
+}
+
+#content-related {
+  margin-top: 150px;
+}
+
+.admin-actions h2 {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 18px;
+  color: #333;
+  font-weight: 400;
+}
+
+@media (min-width: 1025px) {
+.admin-actions {
+  margin-right: -300px;
+  width: 260px;
+  margin-left: 40px;
+}
+}
+
+@media (max-width: 1024px) and (min-width: 767px) {
+.admin-actions {
+  margin-left: 30px;
+  margin-right: -300px;
+  width: 260px;
+}
+}
+
+@media (max-width: 767px) {
+.admin-actions {
+    width: 100%;
+    margin-bottom: 20px;
+}
+}

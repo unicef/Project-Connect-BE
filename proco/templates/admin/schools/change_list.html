@@ -1,0 +1,123 @@
+{% extends 'admin/change_list.html' %}
+{% load i18n crispy_forms_tags %}
+
+
+{% block extrahead %}
+    {{ block.super }}
+
+    <style type="text/css">
+        .overlay_popup {
+            display:none;
+            position:fixed;
+            z-index: 1000;
+            top:0;
+            right:0;
+            left:0;
+            bottom:0;
+            background:#000;
+            opacity:0.5;
+        }
+
+        .popup {
+            display: none;
+            position: relative;
+            z-index: 1001;
+            top: 50vh;
+            left: 50vw;
+            transform: translate(-50%, -50%);
+            width: 50vw;
+            position: fixed;
+        }
+
+
+        .popup-body {
+            background-color: #eee;
+            padding: 35px 35px;
+        }
+
+        .popup h2 {
+            height: 55px;
+            line-height: 55px;
+
+            margin-bottom: 0;
+            padding-left: 35px;
+            padding-right: 35px;
+
+            background-color: #79aec8;
+            color: white;
+        }
+
+        .import-csv-form .fieldWrapper {
+            margin-bottom: 20px;
+        }
+
+        .import-csv-form label {
+            font-weight: bold;
+            width: 175px;
+        }
+
+        .import-csv-form .fieldWrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .import-csv-form .buttons-wrapper {
+            text-align: right;
+        }
+    </style>
+
+    <script type="text/javascript">
+        (function ($) {
+            $(document).ready(function() {
+                $('.import-link').click(function(e) {
+                    e.preventDefault();
+
+                    var popup_id = $('#' + $(this).attr("rel"));
+                    $(popup_id).show();
+                    $('.overlay_popup').show();
+                });
+                $('.overlay_popup').click(function() {
+                    $('.overlay_popup, .popup').hide();
+                });
+            });
+        })(django.jQuery);
+    </script>
+{% endblock %}
+
+
+{% block object-tools-items %}
+    <li>
+        <a class="import-link" rel="import-popup" href="{% url 'admin:schools_school_import_csv' %}">Import CSV</a>
+    </li>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+    <div class="overlay_popup"></div>
+    <div id="import-popup" class="popup">
+        <h2>CSV Import</h2>
+        <div class="popup-body">
+
+            <form enctype="multipart/form-data" action="{% url 'admin:schools_school_import_csv' %}" method="post" class="import-csv-form">
+                {% csrf_token %}
+
+                {% for field in import_form %}
+                    <div class="fieldWrapper {{field.name}} {% if field.errors %}error{% endif %}">
+                        {{ field.label_tag }}
+                        <div class="input-wrapper">
+                            {{ field }}
+                            <div class="input-background"></div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="buttons-wrapper">
+                    <input type="submit" name="submit" value="Submit" class="btn btn-primary button" id="submit-id-submit">
+                </div>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

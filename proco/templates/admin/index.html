@@ -1,0 +1,27 @@
+{% extends "admin/index.html" %}
+{% load staticfiles %}
+
+{% block sidebar %}
+  {% if user.is_superuser %}
+    <div class="admin-actions">
+      <h2>Global actions</h2>
+      <ul class="action-list">
+        <li>
+          <a href="{% url 'admin:admin_invalidate_cache' %}">
+            <i class="fas fa-trash clear-cache"></i>
+            INVALIDATE CACHE
+          </a>
+        </li>
+      </ul>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  {% if user.is_superuser %}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/styles/admin.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendor/fontawesome/css/all.css' %}">
+  {% endif %}
+{% endblock %}

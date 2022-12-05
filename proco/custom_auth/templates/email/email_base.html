@@ -1,0 +1,77 @@
+{% load static %}
+
+{% block html %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700);
+
+    body, td{
+      font-family: Helvetica,Arial,sans-serif;
+    }
+    p{
+      color: #2d2d2d;
+      font-size: 18px;
+      line-height: 1.3;
+      margin: 0;
+      padding: 10px 0;
+    }
+    p.heading {
+      text-align: center;
+      font-size: 24pt;
+      font-weight: 700;
+    }
+    p.heading strong {
+    }
+    p.extra-info {
+      font-size: 11pt;
+      color: grey;
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 23px 0; background-color: #1c262a;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0"
+       style="max-width:545px; margin:0 auto; background-color: #ffffff;">
+  <tr>
+    <td align="center" style="padding: 0 20px;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+        <tbody width="100%">
+        <tr>
+          <td style="padding-bottom: 10px; text-align: center;" colspan="2">
+            <!-- Add link to index page -->
+            <img src="{% static 'logo.png' %}" alt="Logo"
+                 style="max-width: 240px; border-bottom: 1px solid rgb(206, 220, 225); padding: 13px 0px;">
+          </td>
+        </tr>
+        <tr>
+          <td style="color:#2d2d2d; padding-bottom: 10px;" colspan="2">
+            {% block content %}{% endblock %}
+            <br/>
+            <p style="text-align: center;">
+              <a href="#">
+                <img height="40px" width="auto" src="#">
+              </a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="border-top:1px solid #cedce1;color:#aab7bc;font-size:12px;text-align:center;padding:5px; line-height: 20px"
+              colspan="2">
+            Copyright © {% now 'Y' %},<br/>
+            All rights reserved.<br/>
+            <a href="{{ request.META.HTTP_NAME }}/legal_terms/" style="color: #6486C0;">Terms of Service</a> |
+            <a href="{{ request.META.HTTP_NAME }}/privacy/" style="color: #6486C0;">Privacy Policy</a> |
+            <br/>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
+{% endblock %}

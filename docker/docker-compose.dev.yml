@@ -1,0 +1,82 @@
+version: "3"
+
+services:
+  db:
+    container_name: proco_dev_db
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-db
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: proco
+    volumes:
+      - "../postgres_data:/postgres_data"
+
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"
+
+  backend:
+    container_name: proco_dev_backend
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-dev
+    command: bash -c "sleep 10 && pipenv run python manage.py migrate && pipenv run python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgis://test:test@db/proco
+      CELERY_BROKER_URL: amqp://rabbitmq:rabbitmq@rabbitmq/
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    volumes:
+      - "..:/code"
+
+  rabbitmq:
+    image: rabbitmq:3.8-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+
+  celery_beat:
+    container_name: proco_dev_beat
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-dev
+    command: bash -c "sleep 10 && pipenv run celery --app=proco.taskapp beat --loglevel=INFO"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgis://test:test@db/proco
+      CELERY_BROKER_URL: amqp://rabbitmq:rabbitmq@rabbitmq/
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - "..:/code"
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+
+  celery_worker:
+    container_name: proco_dev_celeryd
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-dev
+    command: bash -c "sleep 10 && pipenv run celery --app=proco.taskapp worker --loglevel=INFO --time-limit=300 --concurrency=2 --soft-time-limit=60"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgis://test:test@db/proco
+      CELERY_BROKER_URL: amqp://rabbitmq:rabbitmq@rabbitmq/
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - "..:/code"
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
