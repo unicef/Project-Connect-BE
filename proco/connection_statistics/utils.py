@@ -101,6 +101,8 @@ def aggregate_school_daily_status_to_school_weekly_status(country) -> bool:
             school_weekly.electricity_availability = prev_weekly.electricity_availability
             school_weekly.computer_lab = prev_weekly.computer_lab
             school_weekly.num_computers = prev_weekly.num_computers
+            school_weekly.coverage_availability = prev_weekly.coverage_availability
+            school_weekly.coverage_type = prev_weekly.coverage_type
 
         school_weekly.save()
 

@@ -26,6 +26,8 @@ class DailyCheckApp_Measurement(models.Model):
     Download = models.FloatField(blank=True)
     Upload = models.FloatField(blank=True)
     Latency = models.IntegerField(blank=True)
+    CountryCode = models.TextField(blank=True)
+    IpAddres = models.TextField(blank=True)
     Results = JSONField(default=dict)
 
     objects = DailyCheckApp_MeasurementManager()

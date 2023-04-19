@@ -5,6 +5,7 @@ from django.utils.functional import cached_property
 import requests
 from dateutil import parser as dateutil_parser
 from pytz import UTC
+import uuid
 
 from proco.connection_statistics.models import RealTimeConnectivity, SchoolWeeklyStatus
 from proco.locations.models import Country
@@ -34,12 +35,21 @@ class BrasilSimnetLoader(object):
             environment = school_data.get('TP_LOCALIZACAO', '').lower()
             environment = brasil_environment_map.get(environment, environment)
 
+            external_id = school_data['CO_ENTIDADE']
+            school_name = school_data['NO_ENTIDADE']
+            latitude = school_data['LAT']
+            longitude = school_data['LNG']
+
+            giga_id_input_string = str(str(external_id) + str(school_name) + str(latitude) + str(longitude))
+            giga_id_school = uuid.uuid3(uuid.NAMESPACE_DNS, giga_id_input_string)
+
             school, created = School.objects.update_or_create(
-                external_id=school_data['CO_ENTIDADE'],
+                external_id=external_id,
                 country=self.country,
+                giga_id_school=giga_id_school,
                 defaults={
-                    'name': school_data['NO_ENTIDADE'],
-                    'geopoint': Point(x=school_data['LNG'], y=school_data['LAT']),
+                    'name': school_name,
+                    'geopoint': Point(x=longitude, y=latitude),
                     'environment': environment,
                     'admin_1_name': school_data.get('NM_ESTADO', ''),
                     'admin_4_name': school_data.get('NM_MUNICIP', ''),

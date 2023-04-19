@@ -7,7 +7,7 @@ trigger:
 - unicef/dev-master-api
 
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-22.04'
 variables: 
   dockerRegistryServiceConnection: 'UNICEF_DATA_CONNECT_WEB_ACR'
   dockerfilePath: './Dockerfile'

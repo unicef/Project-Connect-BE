@@ -16,5 +16,7 @@ CREATE TABLE public.dailycheckapp_measurements (
     "Download" double precision,
     "Upload" double precision,
     "Latency" bigint,
-    "Results" jsonb
+    "CountryCode" text,
+    "IpAddress" text,
+    "Results" jsonb,
 );

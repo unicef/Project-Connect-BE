@@ -15,7 +15,8 @@ def sync_dailycheckapp_realtime_data():
 
     realtime = []
 
-    countries = {m.ClientInfo.get('Country') for m in dailycheckapp_measurements}
+    #countries = {m.ClientInfo.get('Country') for m in dailycheckapp_measurements}
+    countries = {m.CountryCode for m in dailycheckapp_measurements}
     for country_code in countries:
         if country_code:
             country = Country.objects.filter(code=country_code).first()
@@ -26,7 +27,8 @@ def sync_dailycheckapp_realtime_data():
         if country:
             schools_qs = schools_qs.filter(country=country)
 
-        schools_ids = {m.school_id for m in dailycheckapp_measurements if m.ClientInfo.get('Country') == country_code}
+        #schools_ids = {m.school_id for m in dailycheckapp_measurements if m.ClientInfo.get('Country') == country_code}
+        schools_ids = {m.school_id for m in dailycheckapp_measurements if m.CountryCode == country_code}
         schools = {
             school.external_id: school
             for school in schools_qs.filter(external_id__in=schools_ids)
@@ -36,13 +38,13 @@ def sync_dailycheckapp_realtime_data():
             if dailycheckapp_measurement.school_id not in schools:
                 logger.debug(f'skipping dailycheckapp_measurement {dailycheckapp_measurement.UUID}: unknown school {dailycheckapp_measurement.school_id}')
                 continue
-
-            realtime.append(RealTimeConnectivity(
-                created=dailycheckapp_measurement.Timestamp,
-                connectivity_speed=dailycheckapp_measurement.Download * 1024,  # kb/s -> b/s
-                connectivity_latency=dailycheckapp_measurement.Latency,
-                school=schools[dailycheckapp_measurement.school_id],
-            ))
+            if(dailycheckapp_measurement.Download > 0 and dailycheckapp_measurement.Latency > 0):
+                realtime.append(RealTimeConnectivity(
+                    created=dailycheckapp_measurement.Timestamp,
+                    connectivity_speed=dailycheckapp_measurement.Download * 1024,  # kb/s -> b/s
+                    connectivity_latency=dailycheckapp_measurement.Latency,
+                    school=schools[dailycheckapp_measurement.school_id],
+                ))
 
     RealTimeConnectivity.objects.bulk_create(realtime)
 
